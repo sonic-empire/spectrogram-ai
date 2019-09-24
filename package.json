@@ -1,0 +1,29 @@
+{
+  "name": "purenode",
+  "version": "1.0.0",
+  "description": "",
+  "main": "spectrogram_node.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --max-old-space-size=8192 index.js",
+    "tensorboard": "tensorboard --logdir ./.tmp"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "tf-models/*",
+      ".tmp/*"
+    ]
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tensorflow/tfjs-node": "^1.2.9",
+    "async": "^3.1.0",
+    "debug": "^4.1.1",
+    "dotenv": "^8.1.0",
+    "lodash": "^4.17.15",
+    "mkdirp": "^0.5.1",
+    "node-remote-plot": "^1.3.0",
+    "nodemon": "^1.19.2"
+  }
+}
