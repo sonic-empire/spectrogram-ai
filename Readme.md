@@ -1,17 +1,13 @@
-about fft/spectrometer in python
-https://www.oreilly.com/library/view/elegant-scipy/9781491922927/ch04.html
+# Reinforcement
 
-digital signal processing
-https://dsp.stackexchange.com/
+# Test Setup
+Two synthesizers are organized in a rack. One is phase inverted. At the same settings both synths cancel each other out. The difference is recorded. 
+![tweak](docs/compare.png)
 
-tensorflow audio recognizer
-https://www.tensorflow.org/js/tutorials/transfer/audio_recognizer
+The AI tweaks the first chain and gets rewarded if the sum of outputs is lower than before. 
+![tweak](docs/tweak.png)
 
-Project description:
-I create a sample set of audio files. I got a reference file and then a batch of files which are e.g. too high in frequency and a batch which is to low in frequency.
+## Usefule ressources
 
-I analyze these audios with an FFT, that I get a spectrogram as an image or tensor for each file. So my features are the frequencies over time. 
-
-The audios (minus batch, plus batch) are my training set. 
-
-The labels are "+", "-" (,"0") .
+- [ReImproveJS](https://github.com/BeTomorrow/ReImproveJS/blob/master/docs/README.md)
+- [MetaCar](https://www.metacar-project.com)
