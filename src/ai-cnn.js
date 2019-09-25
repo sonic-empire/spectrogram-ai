@@ -17,7 +17,7 @@ fs.mkdir(SAVE_PATH, {recursive: true}, (err) => {
 
 tfNode.node.summaryFileWriter('./.tmp/');
 
-class MusicAI {
+class MusicAICNN {
     constructor(options) {
         this.features = [];
         this.labels = []; // shape [x, 2] drum, noise
@@ -255,4 +255,4 @@ class MusicAI {
     }
 }
 
-module.exports = MusicAI;
+module.exports = MusicAICNN;
