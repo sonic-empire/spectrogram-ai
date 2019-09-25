@@ -21,6 +21,7 @@ class MusicAI {
     constructor(options) {
         this.features = [];
         this.labels = []; // shape [x, 2] drum, noise
+        this.labelsTranslation = ['Minus', 'Plus'];
 
         this.options = Object.assign(
             {
@@ -229,14 +230,17 @@ class MusicAI {
         });
     }
 
-    // test() {
-    //     console.log('Testing stack', this.features.shape[1]);
-    //     for (let i = 0; i < this.features.shape[1] - 1; i++) {
-    //         const testFeatures = this.features.slice(i, 1);
-    //         const predicition = this.model.predict(testFeatures).dataSync();
-    //         console.log("predicition %s, labels %s", predicition, this.labels.slice(i, 1));
-    //     }
-    // }
+    predict(testFeature, callback) {
+        try {
+            testFeature = tfNode.tensor3d([testFeature], [1, testFeature.length, testFeature[0].length]);
+            testFeature = testFeature.reshape([1,this.features.shape[1],this.features.shape[2],1]);
+            const predicition = this.model.predict(testFeature).dataSync();
+            return callback(null, predicition);
+        } catch (err) {
+            return callback("Couldn't reshape testFeature" + err);
+        }
+
+    }
 
     buildFitSaveModel(callback) {
         // build the model
