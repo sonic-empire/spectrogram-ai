@@ -1,11 +1,11 @@
 require('dotenv').config();
 const debugPredict = require('debug')('predict');
 
-const MusicAI = require('./ai');
+const MusicAICNN = require('./ai-cnn');
 const chokidar = require('chokidar');
 const fs = require('fs');
 const options = {};
-const ai = new MusicAI(options);
+const ai = new MusicAICNN(options);
 const async = require('async');
 const request = require('request');
 
