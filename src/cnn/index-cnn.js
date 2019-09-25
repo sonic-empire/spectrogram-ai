@@ -7,8 +7,8 @@ const options = {};
 const ai = new MusicAICNN(options);
 const async = require('async');
 
-const maxHelper = require('./max.helper');
-const fileHelper = require('./file.helper');
+const maxHelper = require('../helper/max.helper');
+const fileHelper = require('../helper/file.helper');
 
 /**
  * Watch the predict folder for new files
