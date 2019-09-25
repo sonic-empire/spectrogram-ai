@@ -1,26 +1,15 @@
+const debugHelperMax = require('debug')('helper:max');
 const MAX4N_HOST = process.env.MAX4N_HOST || 'http://localhost:3200';
 const request = require('request');
 
 /**
  * Sends a knob value to m4N
- * @param prediction
+ * @param value
  * @return {*}
  */
-exports.controlMaxForLive = (prediction, callback) => {
-    let value;
-    if (prediction[0] === 1) {
-        // sample is minus => knob needs to turn +
-        console.log('is minus');
-        value = 1;
-    } else if (prediction[1] === 1) {
-        // sample is plus => knob needs to turn -1
-        console.log('is plus');
-        value = -1;
-    } else {
-        console.log('is equal');
-    }
-
-    if (value) {
+exports.controlMaxForLive = (value, callback) => {
+    if (value != null) {
+        debugHelperMax('Turn knob value', value);
         request.post(`${MAX4N_HOST}/knob1`).json({value}).on('response', (res) => {
             let responseData = "";
             res.on('data', chunk => responseData += chunk);

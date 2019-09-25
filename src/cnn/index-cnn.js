@@ -23,7 +23,19 @@ const watchPredictFolder = () => {
                     console.error(err);
                 } else {
                     debugPredict('prediciton for', filePath, prediciton);
-                    maxHelper.controlMaxForLive(prediciton, (err) => {
+                    let value;
+                    if (prediction[0] === 1) {
+                        // sample is minus => knob needs to turn +
+                        console.log('is minus');
+                        value = 1;
+                    } else if (prediction[1] === 1) {
+                        // sample is plus => knob needs to turn -1
+                        console.log('is plus');
+                        value = -1;
+                    } else {
+                        console.log('is equal');
+                    }
+                    maxHelper.controlMaxForLive(value, (err) => {
                         if (err) {
                             console.error(err)
                         }
