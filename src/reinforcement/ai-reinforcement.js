@@ -1,7 +1,7 @@
-const ReImprove = require('reimprovejs');
+const ReImprove = require('reimprovejs/dist/reimprove.js');
 
 class MusicAIReinforcement {
-    constructor(options) {
+    constructor(options = {}) {
         this.options = Object.assign({
             modelFitConfig: {              // Exactly the same idea here by using tfjs's model's
                 epochs: 1,                        // fit config.
@@ -57,24 +57,25 @@ class MusicAIReinforcement {
         };
 
         this.academy = new ReImprove.Academy();    // First we need an academy to host everything
-        this.teacher = this.addTeacher(teacherConfig);
-        const agent = this.addAgent(agentConfig);
+        this.teacher = this.academy.addTeacher(teacherConfig);
+        this.agent = this.academy.addAgent(agentConfig);
 
-        this.academy.assignTeacherToAgent(agent, this.teacher);
+        this.academy.assignTeacherToAgent(this.agent, this.teacher);
     }
 
-    reward() {
-        this.academy.addRewardToAgent(agent, 1.0)        // Give a nice reward if the agent did something nice !
+    reward(rew = 1) {
+        this.academy.addRewardToAgent(this.agent, rew)        // Give a nice reward if the agent did something nice !
     }
 
-    penality() {
-        this.academy.addRewardToAgent(agent, -1.0)        // Give a bad reward to the agent if he did something wrong
+    penality(pen = -1) {
+        this.academy.addRewardToAgent(this.agent, pen)        // Give a bad reward to the agent if he did something wrong
     }
 
-    async step (time) {
-        await this.academy.step([               // Let the magic operate ...
+    async step (inputs) {
+        const result = await this.academy.step([               // Let the magic operate ...
             {teacherName: this.teacher, agentsInput: inputs}
         ]);
+        return result.get(this.agent)
     }
 
 }
