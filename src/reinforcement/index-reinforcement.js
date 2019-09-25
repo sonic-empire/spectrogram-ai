@@ -1,37 +1,51 @@
 require('dotenv').config();
 const debugReinforcement = require('debug')('reinforcement');
 
-const fs = require('fs');
-const assert = require('assert');
 const _ = require('lodash');
 
 const MusicAIReinforcement = require('./ai-reinforcement');
 const musicAIReinforcement = new MusicAIReinforcement();
 const maxHelper = require('../helper/max.helper');
-const fileHelper = require('../helper/file.helper');
+const express = require("express");
+const bodyParser = require('body-parser');
 
+const PORT = process.env.PORT || 3100;
 let round;
 let previousFailure;
 
 /**
- * Watch the predict folder for new diff. spectrogram
+ * routes
+ * @param app
  */
-const watchPredictFolder = () => {
-    round = 0;
-    previousFailure = 0;
-    fileHelper.watchPredictFolder(runCycle)
+const routes = (app) => {
+    app.post('/spectrogram', function (req, res) {
+        if (req.body.spectrogram) {
+            runCycle(req.body.spectrogram).then( () => {
+
+            });
+        }
+        res.json({success: true})
+    });
 };
 
-const control = (action, filePath) => {
+/**
+ * Open a server (default port 3100) to listen for new spectrorams
+ */
+const listenForSpectrograms = () => {
+    round = 0;
+    previousFailure = 0;
+    const app = express();
+    app.use(bodyParser.json({limit: '100mb'}));
+    routes(app);
+    app.listen(PORT);
+    debugReinforcement('Listening on', PORT);
+};
+
+const control = (action) => {
     maxHelper.controlMaxForLive(action, (err) => {
         if (err) {
             console.error(err)
         }
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                console.error(err);
-            }
-        });
     });
 };
 
@@ -41,55 +55,52 @@ const control = (action, filePath) => {
  * @param currentSpectro
  * @return {Promise<void>}
  */
-const runCycle = async (err, currentSpectro, filePath) => {
-    if (err) {
-        console.log(err)
-    } else {
-        debugReinforcement('\n\n---------------------------\nRound', round);
+const runCycle = async (currentSpectro) => {
+    debugReinforcement('\n\n---------------------------\nRound', round);
 
-        console.log('currentSpectro');
-        console.table(currentSpectro[0]);
+    console.log('currentSpectro');
+    console.table(currentSpectro[0]);
 
-        // Give the reward for the previous round
-        if (round > 0) {
-            const difference = getDifference(currentSpectro);
-            debugReinforcement("difference", difference);
-            if (difference > 0) {
-                debugReinforcement("PENALTY");
-                musicAIReinforcement.penality(-1);
-            } else if (difference < 0) {
-                debugReinforcement("REWARD");
-                musicAIReinforcement.reward(1);
-            }
+    // Give the reward for the previous round
+    if (round > 0) {
+        const difference = getDifference(currentSpectro);
+        debugReinforcement("difference", difference);
+        if (difference > 0) {
+            debugReinforcement("PENALTY");
+            musicAIReinforcement.penality(-1);
+        } else if (difference < 0) {
+            debugReinforcement("REWARD");
+            musicAIReinforcement.reward(1);
         }
-
-        // Get the recommended action by the AI
-        // assert.equal(inputs.length, inputSize, "The Input Size dose not match the Inputs Array length");
-        const input = _.flattenDeep(currentSpectro);
-        const action = await musicAIReinforcement.step(input);
-        debugReinforcement('ACTION', action);
-
-        adjustKnob1 = 0;
-        if (action) {
-            if (action === 0) {
-                debugReinforcement('=');
-                // do nothing
-                adjustKnob1 = 0; // to reset gate in ableton
-            } else if (action === 1) {
-                debugReinforcement('+');
-                adjustKnob1 = 1; // up
-            } else if (action === 2) {
-                debugReinforcement('-');
-                adjustKnob1 = -1; // down
-            } else {
-                console.log('unknown action', action)
-            }
-        }
-
-        // control
-        control(adjustKnob1, filePath);
-        round++;
     }
+
+    // Get the recommended action by the AI
+    // assert.equal(inputs.length, inputSize, "The Input Size dose not match the Inputs Array length");
+    const input = _.flattenDeep(currentSpectro);
+    const action = await musicAIReinforcement.step(input);
+    debugReinforcement('ACTION', action);
+
+    adjustKnob1 = 0;
+    if (action) {
+        if (action === 0) {
+            debugReinforcement('=');
+            // do nothing
+            adjustKnob1 = 0; // to reset gate in ableton
+        } else if (action === 1) {
+            debugReinforcement('+');
+            adjustKnob1 = 1; // up
+        } else if (action === 2) {
+            debugReinforcement('-');
+            adjustKnob1 = -1; // down
+        } else {
+            console.log('unknown action', action)
+        }
+    }
+
+    // control
+    control(adjustKnob1);
+    round++;
+
 };
 
 /**
@@ -120,4 +131,4 @@ const getDifference = (currentSpectro) => {
     return difference;
 };
 
-watchPredictFolder();
+listenForSpectrograms();
