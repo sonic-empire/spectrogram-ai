@@ -15,7 +15,9 @@ The AI tweaks the first chain and gets rewarded if the sum of outputs is lower t
 # Notices
 
 - Use this module with [nodejs-spectrogram](https://github.com/sonic-empire/nodejs-spectrogram)
-- *M4L patches coming soon*
+- M4L patches:
+  - [VST-tuner](https://github.com/sonic-empire/vst-tuner)
+  - [Recorder](https://github.com/sonic-empire/record-clip)
 
 # Usefule ressources
 
