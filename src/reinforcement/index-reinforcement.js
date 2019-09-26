@@ -1,5 +1,7 @@
 require('dotenv').config();
 const debugReinforcement = require('debug')('reinforcement');
+const debugReinforcementVerbose = require('debug')('reinforcement:verbose');
+
 
 const _ = require('lodash');
 
@@ -12,6 +14,7 @@ const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 3100;
 let round;
 let previousFailure;
+let previousCommand;
 
 /**
  * routes
@@ -20,7 +23,7 @@ let previousFailure;
 const routes = (app) => {
     app.post('/spectrogram', function (req, res) {
         if (req.body.spectrogram) {
-            runCycle(req.body.spectrogram).then( () => {
+            runCycle(req.body.spectrogram).then(() => {
 
             });
         }
@@ -58,19 +61,28 @@ const control = (action) => {
 const runCycle = async (currentSpectro) => {
     debugReinforcement('\n\n---------------------------\nRound', round);
 
-    console.log('currentSpectro');
-    console.table(currentSpectro[0]);
+    if (debugReinforcementVerbose.enabled) {
+        debugReinforcementVerbose('currentSpectro');
+        console.table(currentSpectro[0]);
+    }
 
     // Give the reward for the previous round
     if (round > 0) {
         const difference = getDifference(currentSpectro);
         debugReinforcement("difference", difference);
+        debugReinforcement('PREV CMD', previousCommand);
         if (difference > 0) {
-            debugReinforcement("PENALTY");
-            musicAIReinforcement.penality(-1);
+            const penalty = -difference;//-Math.sqrt(Math.abs(difference));
+            debugReinforcement("PENALTY", penalty);
+            musicAIReinforcement.penality(penalty);
         } else if (difference < 0) {
-            debugReinforcement("REWARD");
-            musicAIReinforcement.reward(1);
+            const reward = -difference; //Math.sqrt(Math.abs(difference));
+            debugReinforcement("REWARD", reward);
+            musicAIReinforcement.reward(reward);
+        } else {
+            const reward = 10;
+            debugReinforcement("REWARD", reward);
+            musicAIReinforcement.reward(reward);
         }
     }
 
@@ -80,18 +92,22 @@ const runCycle = async (currentSpectro) => {
     const action = await musicAIReinforcement.step(input);
     debugReinforcement('ACTION', action);
 
+
     adjustKnob1 = 0;
     if (action) {
         if (action === 0) {
             debugReinforcement('=');
             // do nothing
             adjustKnob1 = 0; // to reset gate in ableton
-        } else if (action === 1) {
+            previousCommand = '=';
+        } else if (action > 0 && action <= 8) {
             debugReinforcement('+');
-            adjustKnob1 = 1; // up
-        } else if (action === 2) {
+            adjustKnob1 = action; // up
+            previousCommand = '+';
+        } else if (action > 8 && action <= 16) {
             debugReinforcement('-');
-            adjustKnob1 = -1; // down
+            adjustKnob1 = -(action -8); // down
+            previousCommand = '-';
         } else {
             console.log('unknown action', action)
         }
