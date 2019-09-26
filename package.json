@@ -5,8 +5,8 @@
   "main": "spectrogram_node.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "cnn": "nodemon --max-old-space-size=8192 cnn/cnn-index.js",
-    "reinforcement": "nodemon --max-old-space-size=8192 reinforcement/reinforcement-index.js",
+    "cnn": "nodemon --max-old-space-size=8192 src/cnn/index-cnn.js",
+    "reinforcement": "nodemon --max-old-space-size=8192 src/reinforcement/index-reinforcement.js",
     "tensorboard": "tensorboard --logdir ./.tmp"
   },
   "nodemonConfig": {
