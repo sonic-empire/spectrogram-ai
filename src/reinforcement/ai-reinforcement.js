@@ -1,4 +1,12 @@
+const fs = require('fs');
 const ReImprove = require('reimprovejs/dist/reimprove.js');
+const { NodeFileSystem } = require("@tensorflow/tfjs-node/dist/io/file_system");
+
+const SAVE_PATH = './tf-models/modelr';
+
+fs.mkdir(SAVE_PATH, {recursive: true}, (err) => {
+    if (err) throw err;
+});
 
 class MusicAIReinforcement {
     constructor(options = {}) {
@@ -15,6 +23,10 @@ class MusicAIReinforcement {
         this.options.totalInputSize = (this.options.inputSize + this.options.numActions) * this.options.temporalWindow + this.options.inputSize;
         this.buildModel();
         this.buildAgent();
+    }
+
+    async saveModel() {
+        await this.model.model.save(new NodeFileSystem( SAVE_PATH ))
     }
 
     buildModel() {
