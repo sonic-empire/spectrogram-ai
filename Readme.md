@@ -2,6 +2,7 @@
 Training data is in the data-in folder. Limitation, can be trained for one specific synth knob.
 
 # Reinforcement
+![spectro-ai](docs/spectro-Ai.mov.gif)
 
 ## Test Setup
 Two synthesizers are organized in a rack. One is phase inverted. At the same settings both synths cancel each other out. The difference is recorded. 
